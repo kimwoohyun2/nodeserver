@@ -33,11 +33,15 @@ const bodyParser_post = require('body-parser')
 // 세션을 mysql db에 저장하기 위해 해당 모듈을 불러온다.
 const MySQLStore = require("express-mysql-session")(expressSession);
 
+// vue router와 express router 연동을 위해 해당 모듈을 불러온다.
+const history = require('connect-history-api-fallback');
+
 
 // *************************************************************
 // *  2. express 객체 생성
 // *************************************************************
 const app = express()
+const router = express.Router();
 
 
 // *************************************************************
@@ -63,18 +67,9 @@ connection.connect();
 // *  4. 미들웨어들 등록 시작, 아래 미들웨어들은 내부적으로 next() 가 실행됨
 // *************************************************************
 // app.use 메소드는 원하는 미들웨어를 추가할때 사용한다.
-// 아래 두줄이 없다면
-// http://서버주소/css 로 접근하면 접근이 거부된다.
-// 아래 두 줄을 넣어줌으로써
-// 실행되는 서버 코드 기준 디렉토리의 static 폴더 내 css 폴더를
-// 외부 클라이언트들이 /css 경로로 접근할 수 있다.
-// js도 마찬가지이다.
-app.use('/css', express.static('./static/css'))
-app.use('/js', express.static('./static/js'))
 
-// join은 __dirname(현재 .js 파일의 path) 와 public 을 합친다.
-// 이렇게 경로를 세팅하면 public 폴더 안에 있는 것을 곧바로 쓸 수 있게 된다.
-app.use(serveStatic(path.join(__dirname, 'public')))
+
+
 
 // post 방식 일경우 (begin)
 // post 의 방식은 url 에 추가하는 방식이 아니고 body 라는 곳에 추가하여 전송하는 방식
@@ -109,6 +104,36 @@ app.use(expressSession({
   },
 }));
 
+// 아래 두줄이 없다면
+// http://서버주소/css 로 접근하면 접근이 거부된다.
+// 아래 두 줄을 넣어줌으로써
+// 실행되는 서버 코드 기준 디렉토리의 static 폴더 내 css 폴더를
+// 외부 클라이언트들이 /css 경로로 접근할 수 있다.
+// js도 마찬가지이다.
+// app.use('/css', express.static('./static/css'))
+// app.use('/js', express.static('./static/js'))
+
+
+
+// const staticFile = express.static(path.join(__dirname + '/dist'));
+const staticFile = express.static(path.join(__dirname + '/public'));
+// 반드시 이렇게 위아래로, 중복으로, 등록해줘야
+// vue router와 express router 가 정상 연동된다.
+app.use(staticFile);
+
+// join은 __dirname(현재 .js 파일의 path) 와 public 을 합친다.
+// 이렇게 경로를 세팅하면 public 폴더 안에 있는 것을 곧바로 쓸 수 있게 된다.
+// app.use(serveStatic(path.join(__dirname, 'public')))
+
+// vue router와 express router 연동을 위해 아래와 같이 등록한다.
+app.use(history({
+  disableDotRule: true,
+  verbose: true
+}));
+
+// 반드시 이렇게 위아래로, 중복으로, 등록해줘야
+// vue router와 express router 가 정상 연동된다.
+app.use(staticFile);
 
 // *************************************************************
 // *  5. 라우터 등록
@@ -124,7 +149,8 @@ app.all('/*', (req, res, next) => {
 
 
 // 회원가입
-app.route('/signup').post(
+router.post('/signup', 
+// app.route('/signup').post(
   // 설정된 쿠키정보를 본다.
   (req, res) => {
 
@@ -215,7 +241,8 @@ app.route('/signup').post(
 );
 
 
-app.route('/login2').post(
+router.post('/login2', 
+// app.route('/login2').post(
   // 설정된 쿠키정보를 본다.
   (req, res) => {
 
@@ -264,9 +291,11 @@ app.route('/login2').post(
   }
 );
 
+
 // http://localhost:3000/process/product 이 주소로 치면 라우터를 통해 바로 여기로 올 수 있다
-app.route('/process/product').get(
-  function (req, res)
+router.get('/process/product', 
+// app.route('/process/product').get(
+  (req, res) =>
   {
     console.log('/process/product  라우팅 함수 실행');
 
@@ -284,8 +313,8 @@ app.route('/process/product').get(
   }
 );
  
- 
-app.route('/process/logout').get(
+router.get('/process/logout', 
+// app.route('/process/logout').get(
   // 설정된 쿠키정보를 본다.
   function (req, res) {
     console.log('/process/loginout 라우팅 함수호출 됨');
@@ -316,7 +345,9 @@ app.route('/process/logout').get(
 
 // 아래는 vue 연동부분이다.
 // express의 라우터로 접근시 public/index.html이 전달되도록 설정한다.
-app.get('/', (req, res) => {
+router.get('*', 
+// app.get('/',
+  (req, res) => {
   // fs.readFile('./static/index.html', (err, data) => {
   //   if (err) {
   //     res.send('에러')
@@ -328,7 +359,7 @@ app.get('/', (req, res) => {
   //     res.end()
   //   }
   // })
-  res.sendFile(path.join(__dirname, '../public', 'index.html'))
+  res.sendFile(path.join(__dirname, '/public', 'index.html'))
 })
 
 // *************************************************************

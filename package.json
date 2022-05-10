@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "connect-history-api-fallback": "^1.6.0",
     "cookie-parser": "^1.4.6",
     "express": "^4.17.3",
     "express-mysql-session": "^2.1.8",
