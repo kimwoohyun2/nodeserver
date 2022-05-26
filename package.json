@@ -8,6 +8,7 @@
   },
   "author": "",
   "license": "ISC",
+  "type": "module",
   "dependencies": {
     "connect-history-api-fallback": "^1.6.0",
     "cookie-parser": "^1.4.6",
@@ -15,6 +16,7 @@
     "express-mysql-session": "^2.1.8",
     "express-session": "^1.17.2",
     "mysql": "^2.18.1",
+    "mysql2": "^2.3.3",
     "socket.io": "^4.4.1"
   }
 }
