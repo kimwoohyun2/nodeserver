@@ -33,7 +33,6 @@ import { Server } from "socket.io";
 
 // const path = require("path");
 import path from "path";
-const __dirname = path.resolve();
 
 // const cookieParser = require("cookie-parser");
 import cookieParser from "cookie-parser";
@@ -132,8 +131,9 @@ console.log(">>>>>>>>>>>>>>>>>>>>>  app.js  123");
 // 아래의 (1) ~ (4) 까지는 vue router와 express router 연동을 위한 로직들이다.
 
 // -------------------------------------------------------------------
-// 아래 두줄은 노드의 라우터를 타지 않고 /public/index.html의 라우트를 타도록 해준다.
+// 아래 (1) ~ (2) 는 노드의 라우터를 타지 않고 /public/index.html의 라우트를 타도록 해준다.
 // (1)
+const __dirname = path.resolve();
 const staticFile = express.static(path.join(__dirname + "/public"));
 // (2)
 app.use(staticFile);
